@@ -33,9 +33,18 @@ class BaseHandler:
         self._template_response_middleware = []
         self._exception_middleware = []
 
-        get_response = self._get_response_async if is_async else self._get_response
-        handler = convert_exception_to_response(get_response)
+        get_response = self._get_response_async if is_async else self._get_response  ###### This is actually the innerest handler
+        handler = convert_exception_to_response(get_response)  ###### Just wrap it to return a response when exception raised
         handler_is_async = is_async
+        
+        ###### Process middlewares in reversed order so it looks like following
+        ###### when handling a request:
+        ######
+        ###### Request ----------------------------------------->
+        ######                                                  |
+        ###### Middleware1 | Middleware 2 | ... | Middleware N  |
+        ######                                                  V
+        ###### Response <---------------------------------------
         for middleware_path in reversed(settings.MIDDLEWARE):
             middleware = import_string(middleware_path)
             middleware_can_sync = getattr(middleware, 'sync_capable', True)
@@ -51,6 +60,7 @@ class BaseHandler:
                 middleware_is_async = middleware_can_async
             try:
                 # Adapt handler, if needed.
+                ###### Convert async/sync handler to sync/async based on `middleware_is_async` and `handler_is_async`
                 adapted_handler = self.adapt_method_mode(
                     middleware_is_async, handler, handler_is_async,
                     debug=settings.DEBUG, name='middleware %s' % middleware_path,
