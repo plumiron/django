@@ -120,11 +120,11 @@ class WSGIRequest(HttpRequest):
 
 
 class WSGIHandler(base.BaseHandler):
-    ######r This is the core part of Django, which is mainly responsible for:
-    ######r 1. loading middlewares
-    ######r 2. routing requests and getting responses
-    ######r These basic functionalities are provided by the parent class 
-    ######r `django.core.handlers.base.BaseHandler`.
+    ###### This is the core part of Django, which is mainly responsible for:
+    ###### 1. loading middlewares
+    ###### 2. routing requests and getting responses
+    ###### These basic functionalities are provided by the parent class 
+    ###### `django.core.handlers.base.BaseHandler`.
 
     request_class = WSGIRequest
 
