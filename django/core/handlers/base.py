@@ -60,6 +60,7 @@ class BaseHandler:
                 middleware_is_async = middleware_can_async
             try:
                 # Adapt handler, if needed.
+                
                 ###### Convert async/sync handler to sync/async based on `middleware_is_async` and `handler_is_async`
                 adapted_handler = self.adapt_method_mode(
                     middleware_is_async, handler, handler_is_async,
@@ -81,6 +82,12 @@ class BaseHandler:
                     'Middleware factory %s returned None.' % middleware_path
                 )
 
+            ###### Add hooks if the middlewaere provides any.
+            ###### Supported middleware hooks:
+            ###### `process_view`: it's called just before Django calls the view and should return `None` if everything goes well.
+            ###### `process_exception`: Django calls it when a view raises an exception. If it returns `None`, the exception will be passed to the upper middleware to handle.
+            ###### `process_template_response`: it is called just after the view has finished executing, if the response instance has a render() method.
+            ###### See details: https://docs.djangoproject.com/en/4.2/topics/http/middleware/#process-view
             if hasattr(mw_instance, 'process_view'):
                 self._view_middleware.insert(
                     0,
