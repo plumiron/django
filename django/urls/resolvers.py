@@ -557,6 +557,10 @@ class URLResolver:
         match = self.pattern.match(path)
         if match:
             new_path, args, kwargs = match
+            
+            ###### `pattern` can be one of the followings:
+            ###### 1. an instance of `URLPattern`, which is a wrapper of `RegexPattern` or `RoutePattern`
+            ###### 2. an instance of `URLResolver`
             for pattern in self.url_patterns:
                 try:
                     sub_match = pattern.resolve(new_path)
