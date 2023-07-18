@@ -40,11 +40,11 @@ class BaseHandler:
         ###### Process middlewares in reversed order so it looks like following
         ###### when handling a request:
         ######
-        ###### Request ----------------------------------------->
-        ######                                                  |
-        ###### Middleware1 | Middleware 2 | ... | Middleware N  |
-        ######                                                  V
-        ###### Response <---------------------------------------
+        ###### Request ----------------------------------------------------------------------------------->
+        ######                                                                                            |
+        ###### Middleware1 | Middleware 2 | ... | Middleware N | _get_response() / _get_response_async()  |
+        ######                                                                                            V
+        ###### Response <----------------------------------------------------------------------------------
         for middleware_path in reversed(settings.MIDDLEWARE):
             middleware = import_string(middleware_path)
             middleware_can_sync = getattr(middleware, 'sync_capable', True)
@@ -184,11 +184,13 @@ class BaseHandler:
         callback, callback_args, callback_kwargs = self.resolve_request(request)
 
         # Apply view middleware
-        for middleware_method in self._view_middleware:
+        for middleware_method in self._view_middleware:  ###### apply the `process_view()` hook provided by each middleware
             response = middleware_method(request, callback, callback_args, callback_kwargs)
             if response:
                 break
 
+        ###### if all `process_view()` hooks return None, call the actual view func (`callback`).
+        ###### otherwise, the response returned by the hook above will be used.
         if response is None:
             wrapped_callback = self.make_view_atomic(callback)
             # If it is an asynchronous view, run it in a subthread.
