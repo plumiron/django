@@ -49,6 +49,11 @@ class BaseHandler:
             middleware = import_string(middleware_path)
             middleware_can_sync = getattr(middleware, 'sync_capable', True)
             middleware_can_async = getattr(middleware, 'async_capable', False)
+
+            ######   | handler_is_async     | True  | False | True  | True  | False | False | True  | False |
+            ######   | middleware_can_sync  | True  | True  | False | True  | False | True  | False | False |
+            ######   | middleware_can_async | True  | True  | True  | False | True  | False | False | False |
+            ######   | middleware_is_async  | True  | False | True  | False | True  | False | False | False |
             if not middleware_can_sync and not middleware_can_async:
                 raise RuntimeError(
                     'Middleware %s must have at least one of '
