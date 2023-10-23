@@ -603,6 +603,9 @@ class URLResolver:
     @cached_property
     def url_patterns(self):
         # urlconf_module might be a valid set of patterns, so we default to it
+        ###### There are two types of `pattern`:
+        ###### - `URLPattern`, indicating an endpoint
+        ###### - `URLResolver`, indicating an intermediate node (`include()`) which can be further resolved
         patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
         try:
             iter(patterns)
