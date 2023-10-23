@@ -11,7 +11,8 @@ from .resolvers import (
 
 def include(arg, namespace=None):
     app_name = None
-    if isinstance(arg, tuple):
+
+    if isinstance(arg, tuple):  ###### be called in the form like `include(("path.to.your.urls", "app_name"), ...)`
         # Callable returning a namespace hint.
         try:
             urlconf_module, app_name = arg
@@ -32,16 +33,19 @@ def include(arg, namespace=None):
 
     if isinstance(urlconf_module, str):
         urlconf_module = import_module(urlconf_module)
+
+    ###### If `urlpatterns` & `app_name` are provided in `urlconf_module`, use them.
     patterns = getattr(urlconf_module, 'urlpatterns', urlconf_module)
     app_name = getattr(urlconf_module, 'app_name', app_name)
-    if namespace and not app_name:
+
+    if namespace and not app_name:  ###### `app_name` must be set too if `namespace` is set.
         raise ImproperlyConfigured(
             'Specifying a namespace in include() without providing an app_name '
             'is not supported. Set the app_name attribute in the included '
             'module, or pass a 2-tuple containing the list of patterns and '
             'app_name instead.',
         )
-    namespace = namespace or app_name
+    namespace = namespace or app_name  ###### Fallback to use `app_name` as `namespace`. So finally we'll get both or neither.
     # Make sure the patterns can be iterated through (without this, some
     # testcases will break).
     if isinstance(patterns, (list, tuple)):
