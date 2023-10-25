@@ -51,17 +51,19 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
             current_ns = current_path.pop() if current_path else None
             # Lookup the name to see if it could be an app identifier.
             try:
-                app_list = resolver.app_dict[ns]
+                app_list = resolver.app_dict[ns]  ###### `app_dict` is a dict mapping app names (app namespaces) to instance lists.
+                                                  ###### `app_list` is a list of the instances of that app (instance namespaces),
+                                                  ###### in reverse order of deployment
                 # Yes! Path part matches an app in the current Resolver.
-                if current_ns and current_ns in app_list:
+                if current_ns and current_ns in app_list:  ###### `current_ns` is an instance namespace
                     # If we are reversing for a particular app, use that
                     # namespace.
                     ns = current_ns
                 elif ns not in app_list:
                     # The name isn't shared by one of the instances (i.e.,
                     # the default) so pick the first instance as the default.
-                    ns = app_list[0]
-            except KeyError:
+                    ns = app_list[0]  ###### This is actually the last deployed instance of that app
+            except KeyError:  ###### `ns` doesn't match any app namespace
                 pass
 
             if ns != current_ns:
