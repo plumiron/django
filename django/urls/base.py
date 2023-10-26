@@ -59,14 +59,14 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                     # If we are reversing for a particular app, use that
                     # namespace.
                     ns = current_ns
-                elif ns not in app_list:
+                elif ns not in app_list:  ###### If `ns` is in `app_list`, then it's the default instance. Otherwise, we'll pick the last deployed instance.
                     # The name isn't shared by one of the instances (i.e.,
                     # the default) so pick the first instance as the default.
                     ns = app_list[0]  ###### This is actually the last deployed instance of that app
             except KeyError:  ###### `ns` doesn't match any app namespace
                 pass
 
-            if ns != current_ns:
+            if ns != current_ns:  ###### When we get here, `ns` must be an instance namespace
                 current_path = None
 
             try:
